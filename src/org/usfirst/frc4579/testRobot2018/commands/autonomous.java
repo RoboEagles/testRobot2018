@@ -40,10 +40,10 @@ public class autonomous extends CommandGroup {
         // Command1 and Command2 will run in parallel.
     	
 //    	if(centerSwitch.get()){
-    		addSequential(new centerAuto());
+//    		addSequential(new centerAuto());
 //    	}
 //    	else{
-//    		addSequential(new sideAuto());
+    		addSequential(new sideAuto());
 //    	}
     	
         // A command group will require all of the subsystems that each member

@@ -10,6 +10,7 @@
 
 
 package org.usfirst.frc4579.testRobot2018.commands;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import org.usfirst.frc4579.testRobot2018.Robot;
 
@@ -35,25 +36,28 @@ public class sideAuto extends Command {
     }
 
 	public int direction,
-				step = 1,
+				step = 0,
 				straightStep = 0,
 				turnStep = 0,
 				straightLocation;
 	public double turnLocation;
-	public boolean endAuto;
+	public boolean endAuto,
+					firstRun = true;
 	
-	public int[] straightDirections = {600,200};
-	public int[] turnDirections = {90,0};
+	Timer timer = new Timer();
+	
+//	public int[] straightDirections = {600,200};
+	public int[] directions = {2,90,5};
 	
     // Called just before this Command runs the first time
     @Override
     protected void initialize() {
-    	if(autonomous.sideSwitch.get()){
-    		direction = 1;
-    	}
-    	else{
-    		direction = -1;
-    	}
+//    	if(autonomous.sideSwitch.get()){
+//    		direction = 1;
+//    	}
+//    	else{
+//    		direction = -1;
+//    	}
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -61,38 +65,46 @@ public class sideAuto extends Command {
     protected void execute() {
     	
     	// Checks if it has run through all the directions
-    	if(straightDirections.length + turnDirections.length < step){
+    	if(directions.length < step){
     		endAuto = true;
     	}
     	
     	// Alternates between when it is tuning and when it is driving straight
     	
     	// The part of the code where it drives straight
-    	else if(step%2 == 1){
-    		if(straightDirections[straightStep] != straightLocation){
+    	else if(step%2 == 0){
+    		if(firstRun){
+    			timer.start();
+    			firstRun = false;
+    		}
+    		
+    		if(timer.get() < directions[step]){
     			Robot.driveTrain.driveStraight(.3);
     			straightLocation = Robot.measurement.getFlowMotionX();
     		}
-    		else{
+    		else if (timer.get() >= directions[step]){
+    			timer.stop();
+    			timer.reset();
     			Robot.driveTrain.stop();
-    			straightStep++;
     			step++;
+    			firstRun = true;
     		}
     	}
     	
     	// The part of the code where it is turning
-    	else{
-    		if(turnDirections[turnStep-1]*direction <= turnLocation){
-    			Robot.driveTrain.joeyAutoDrive(0, .3*direction);
+    	else if (step%2 == 1){
+    		double distance = directions[step] - turnLocation;
+    		if(distance > 0){
+    			Robot.driveTrain.joeyAutoDrive(0, -.7);
     			turnLocation = Robot.measurement.getAngle();
+    			System.out.println("Turning       Distance Left: " + (int)(distance));
     		}
-    		else{
+    		else if (distance <= 0){
     			Robot.driveTrain.stop();
-    			turnStep++;
     			step++;
     		}
     	}
-    	
+    	System.out.println("Side Auto Running       " + step);
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -105,6 +117,10 @@ public class sideAuto extends Command {
     @Override
     protected void end() {
     	Robot.driveTrain.stop();
+    	System.out.println("Side Auto End*****");
+		step = 1;
+		turnLocation = 0;
+    	endAuto = false;
     }
 
     // Called when another command which requires one or more of the same
