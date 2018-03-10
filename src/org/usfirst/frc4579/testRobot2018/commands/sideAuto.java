@@ -75,31 +75,51 @@ public class sideAuto extends Command {
     	else if(step%2 == 0){
     		if(firstRun){
     			timer.start();
+    			
+    			// Makes sure that the code doesn't constantly start the timer
     			firstRun = false;
     		}
     		
+    		// Drives the robot straight until it reaches the goal
     		if(timer.get() < directions[step]){
     			Robot.driveTrain.driveStraight(.3);
     			straightLocation = Robot.measurement.getFlowMotionX();
     		}
+    		
     		else if (timer.get() >= directions[step]){
+    			// Stops and resets the timer so that the next run will start at 0 seconds
     			timer.stop();
     			timer.reset();
+    			
+    			// Stops the driveTrain
     			Robot.driveTrain.stop();
+    			
+    			// Updates which part of the path it is at
     			step++;
+    			
+    			// So the robot can know to start the timer the next time it has to drive straight
     			firstRun = true;
+    			
+    			// Resets the accumulated gyro angle for the drive straight code
+    			Robot.measurement.reset();
     		}
     	}
     	
     	// The part of the code where it is turning
     	else if (step%2 == 1){
+    		// The robots distance from its goal
     		double distance = directions[step] - turnLocation;
     		if(distance > 0){
+    			// Turns the robot
     			Robot.driveTrain.joeyAutoDrive(0, -.7);
+    			
+    			// Updates the robots current angle
     			turnLocation = Robot.measurement.getAngle();
+    			
     			System.out.println("Turning       Distance Left: " + (int)(distance));
     		}
     		else if (distance <= 0){
+    			// Stops and updates where the robot is in the path
     			Robot.driveTrain.stop();
     			step++;
     		}
