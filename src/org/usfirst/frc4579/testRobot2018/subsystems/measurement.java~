@@ -94,6 +94,7 @@ public class measurement extends Subsystem {
 	private double velocityX        = 0.0; // Robot frame.
 	private double velocityY        = 0.0; // Robot frame.
 	
+	private double realAngleZ = 0.0;
 	private double robotAngleRateZ  = 0.0;
 	private double robotAngleZ      = 0.0;
 	private double robotAngleY      = 0.0;
@@ -191,6 +192,8 @@ public class measurement extends Subsystem {
 		// Compute new angular data.
 		robotAngleRateZ = mpu.getGyroRateZ();
 		robotAngleZ    += robotAngleRateZ * deltaT;
+		
+		realAngleZ = getRobotAngle();
 //		System.out.println(robotAngleRateZ);
 		//double angleRateY = mpu.getGyroRateY();
 		//robotAngleY    += angleRateY * deltaT;
@@ -268,6 +271,23 @@ public class measurement extends Subsystem {
 	public void read(boolean isNotMoving, double timeNow){
 		mpu.read(isNotMoving, timeNow);
 	}
+	
+	
+	
+	public double getRobotAngle(){
+		double angle = robotAngleZ % 360;
+		
+		if(angle > 0){
+			return angle;
+		}
+		else if(angle < 0){
+			return (360 + angle);
+		}
+		return realAngleZ;
+	}
+	
+	
+	
 	
 	// Returns the robot angular displacement from its original placement (in degrees).
 	public double getAngle() {

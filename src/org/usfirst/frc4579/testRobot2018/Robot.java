@@ -130,6 +130,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
     	Robot.measurement.measure();
+    	SmartDashboard.putNumber("Real Angle: ", Robot.measurement.getRobotAngle());
     	Robot.measurement.getCounts();
         Scheduler.getInstance().run();
     }
