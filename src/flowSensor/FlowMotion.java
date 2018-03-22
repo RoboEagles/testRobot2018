@@ -13,8 +13,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 public class FlowMotion extends SensorBase  {
 	// Variables for the SPI interface and sensor data.
 	private SPI flow = new SPI(SPI.Port.kOnboardCS0);
-	private ByteBuffer regBuffer = ByteBuffer.allocate(2);    //SPI transaction buffer.
-	private ByteBuffer longBuffer = ByteBuffer.allocate(5);   //SPI transaction buffer.
+	private ByteBuffer regBuffer = ByteBuffer.allocate(12);    //SPI transaction buffer.
+	private ByteBuffer longBuffer = ByteBuffer.allocate(12);   //SPI transaction buffer.
 	private byte[] counts = new byte[5];					//Byte buffer for received data.
 	private int oldDeltaX, oldDeltaY;						//Previous readings.
 	public int deltaX, deltaY;								//Current readings.
@@ -35,7 +35,7 @@ public class FlowMotion extends SensorBase  {
 		oldTime = newTime;
 		
 		regBuffer.put(0, (byte)(2));              //Start with Reg No. 0x02.
-		flow.transaction(regBuffer, longBuffer, 6);  //Do the SPI transaction.
+		flow.transaction(regBuffer, longBuffer, 12);  //Do the SPI transaction.
 		for (int i=0; i<5; i++) counts[i] = longBuffer.get(i);  //Get the returned bytes into the array.
 
 		/*Alternate diagnostic code segment to print out all the sensor registers, in hex.
